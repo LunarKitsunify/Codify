@@ -36,6 +36,18 @@ const settingsData = [
     }
 ];
 
+document.documentElement.style.margin = '0';
+document.documentElement.style.padding = '0';
+document.documentElement.style.width = '100%';
+document.documentElement.style.height = '100%';
+document.documentElement.style.overflow = 'hidden';
+
+document.body.style.margin = '0';
+document.body.style.padding = '0';
+document.body.style.width = '100%';
+document.body.style.height = '100%';
+document.body.style.overflow = 'hidden';
+
 // Create the main container for the application and append it to the document body
 const mainContainer = document.createElement('div');
 mainContainer.style.width = '100%';
@@ -102,7 +114,8 @@ function createModal(id, parent, titleText) {
     const title = document.createElement('h2');
     title.textContent = titleText;
     title.style.margin = '0';
-    title.style.flexGrow = '1'; // The title takes up available space
+    title.style.margin = '0 auto'; // Center the title horizontally
+    title.style.textAlign = 'center';
     title.style.color = '#ffffff'; // White text color
     header.appendChild(title);
 
@@ -120,6 +133,12 @@ function createModal(id, parent, titleText) {
     closeButton.addEventListener('click', () => {
         modalObj.clearContent(); // Clear dynamic content on close
         modalObj.close();
+    });
+    closeButton.addEventListener('mouseenter', () => {
+        closeButton.style.color = '#ff4444'; // Change to red on hover
+    });
+    closeButton.addEventListener('mouseleave', () => {
+        closeButton.style.color = '#ffffff'; // Restore original color
     });
 
     // Append the close button to the header
@@ -213,6 +232,8 @@ function createSettingsMenu(modalObj, settingsData, state) {
             const checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
             checkbox.style.marginLeft = 'auto'; // Push the checkbox to the right
+            checkbox.style.transform = 'scale(1.75)'; // Increase checkbox size
+            checkbox.style.marginRight = '15px'; // Add spacing for aesthetics
 
             // Use existing value from state or default to false
             if (state.hasOwnProperty(setting.name)) {
