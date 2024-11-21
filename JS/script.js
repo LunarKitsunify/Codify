@@ -96,7 +96,7 @@ function createModal(id, parent, titleText) {
     header.style.padding = '10px'; // Padding inside the header
     header.style.backgroundColor = '#252525'; // Darker background for the header
     header.style.borderBottom = '1px solid #444'; // Line separating the header from the content
-    header.style.borderRadius = '8px 8px 0 0'; // Rounded top corners
+    header.style.borderRadius = '8px'; // Rounded top corners
 
     // Add the title to the header
     const title = document.createElement('h2');
