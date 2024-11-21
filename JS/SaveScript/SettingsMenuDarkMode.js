@@ -5,36 +5,31 @@ const settingsState = {};
 // Example settings data, structured in groups with individual settings
 const settingsData = [
     {
-        groupName: 'General Settings', // Name of the settings group
+        groupName: 'General Settings',
         settings: [
             { 
                 name: 'Enable Notifications', 
                 shortDescription: 'Receive alerts', 
-                fullDescription: 'Enables notifications for all important updates.' 
+                fullDescription: 'Enables notifications for all important updates.', 
+                type: 'checkbox' 
             },
             { 
-                name: 'Dark Mode', 
-                shortDescription: 'Switch theme', 
-                fullDescription: 'Switches the interface to a dark theme for better visibility in low light.' 
-            }
-        ]
-    },
-    {
-        groupName: 'Privacy Settings', // Name of the settings group
-        settings: [
-            { 
-                name: 'Share Data', 
-                shortDescription: 'Enable sharing', 
-                fullDescription: 'Allows sharing of your data with third-party applications.' 
+                name: 'Username', 
+                shortDescription: 'Enter your username', 
+                fullDescription: 'Your unique username for the system.', 
+                type: 'text' 
             },
             { 
-                name: 'Tracking', 
-                shortDescription: 'Disable tracking', 
-                fullDescription: 'Prevents websites from tracking your activity online.' 
+                name: 'Theme', 
+                shortDescription: 'Select a theme', 
+                fullDescription: 'Choose between Light and Dark themes.', 
+                type: 'dropdown', 
+                options: ['Light', 'Dark'] 
             }
         ]
     }
 ];
+
 
 document.documentElement.style.margin = '0';
 document.documentElement.style.padding = '0';
@@ -106,8 +101,8 @@ function createModal(id, parent, titleText) {
     header.style.justifyContent = 'space-between';
     header.style.marginBottom = '15px';
     header.style.padding = '10px'; // Padding inside the header
-    header.style.backgroundColor = '#252525'; // Darker background for the header
-    header.style.borderBottom = '1px solid #444'; // Line separating the header from the content
+    header.style.backgroundColor = '#2e2e2e'; // Darker background for the header
+    header.style.borderBottom = '1px solid white'; // Line separating the header from the content
     header.style.borderRadius = '8px'; // Rounded top corners
 
     // Add the title to the header
@@ -178,11 +173,11 @@ function createModal(id, parent, titleText) {
 
 /** 
  * Populates the modal with grouped settings and links them to an external state.
- * Each checkbox will use the value from the provided `state` object if it exists.
- * The setting name and checkbox are displayed on the first line, with a short description on the second line.
+ * Adds different types of input elements based on the provided settings data.
+ * Includes a subtle line between settings for better separation.
  * @param {object} modalObj - The modal object returned by createModal.
  * @param {Array} settingsData - Array of groups and their settings.
- * @param {object} state - External object to store the states of checkboxes.
+ * @param {object} state - External object to store the states of inputs.
  */
 function createSettingsMenu(modalObj, settingsData, state) {
     if (!modalObj || !modalObj.content) {
@@ -202,18 +197,29 @@ function createSettingsMenu(modalObj, settingsData, state) {
         // Add group title
         const groupTitle = document.createElement('h3');
         groupTitle.textContent = group.groupName;
-        groupTitle.style.margin = '0 0 10px 0';
+        groupTitle.style.margin = '0 0 15px 0'; // Increased margin below the group title
+        groupTitle.style.padding = '10px'; // Added padding for the title area
+        groupTitle.style.backgroundColor = '#1e1e1e'; // Background to separate group visually
         groupTitle.style.color = '#ffffff'; // White text color
+        groupTitle.style.borderRadius = '8px'; // Rounded edges for the title box
+        groupTitle.style.border = '1px solid #444'; // Border for the title box
+        groupTitle.style.textAlign = 'center'; // Center-align the group title
         groupContainer.appendChild(groupTitle);
 
         // Add each setting in the group
-        group.settings.forEach(setting => {
+        group.settings.forEach((setting, index) => {
             const settingContainer = document.createElement('div');
             settingContainer.style.display = 'flex';
             settingContainer.style.flexDirection = 'column'; // Vertical stacking of rows
-            settingContainer.style.marginBottom = '10px';
+            settingContainer.style.marginBottom = '15px'; // Space between settings
+            settingContainer.style.paddingBottom = '10px'; // Space above the line
 
-            // First row: setting name and checkbox
+            // Add a subtle border for separation (except the last setting)
+            if (index < group.settings.length - 1) {
+                settingContainer.style.borderBottom = '1px solid #444'; // Thin line
+            }
+
+            // First row: setting name and input element
             const topRow = document.createElement('div');
             topRow.style.display = 'flex';
             topRow.style.alignItems = 'center';
@@ -228,27 +234,42 @@ function createSettingsMenu(modalObj, settingsData, state) {
             settingName.style.color = '#ffffff'; // White text color
             topRow.appendChild(settingName);
 
-            // Checkbox
-            const checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
-            checkbox.style.marginLeft = 'auto'; // Push the checkbox to the right
-            checkbox.style.transform = 'scale(1.75)'; // Increase checkbox size
-            checkbox.style.marginRight = '15px'; // Add spacing for aesthetics
-
-            // Use existing value from state or default to false
-            if (state.hasOwnProperty(setting.name)) {
-                checkbox.checked = state[setting.name]; // Use the stored value
-            } else {
-                state[setting.name] = false; // Initialize with default value
-                checkbox.checked = false;
+            // Input element based on type
+            let inputElement;
+            if (setting.type === 'checkbox') {
+                inputElement = document.createElement('input');
+                inputElement.type = 'checkbox';
+                inputElement.style.marginLeft = 'auto';
+                inputElement.style.transform = 'scale(1.5)'; // Enlarged checkbox
+                inputElement.style.marginRight = '10px'; // Add spacing
+                inputElement.checked = state[setting.name] || false;
+            } else if (setting.type === 'text') {
+                inputElement = document.createElement('input');
+                inputElement.type = 'text';
+                inputElement.style.marginLeft = 'auto';
+                inputElement.style.padding = '5px';
+                inputElement.style.width = '200px'; // Fixed width for text input
+                inputElement.value = state[setting.name] || ''; // Use existing value or default
+            } else if (setting.type === 'dropdown') {
+                inputElement = document.createElement('select');
+                inputElement.style.marginLeft = 'auto';
+                inputElement.style.padding = '5px';
+                inputElement.style.width = '200px';
+                (setting.options || []).forEach(option => {
+                    const optionElement = document.createElement('option');
+                    optionElement.value = option;
+                    optionElement.textContent = option;
+                    inputElement.appendChild(optionElement);
+                });
+                inputElement.value = state[setting.name] || (setting.options ? setting.options[0] : '');
             }
 
-            // Bind checkbox to the external state
-            checkbox.addEventListener('change', () => {
-                state[setting.name] = checkbox.checked; // Sync state on change
+            // Bind input element to external state
+            inputElement.addEventListener('change', () => {
+                state[setting.name] = inputElement.type === 'checkbox' ? inputElement.checked : inputElement.value;
                 console.log(`Setting "${setting.name}" updated: ${state[setting.name]}`);
             });
-            topRow.appendChild(checkbox);
+            topRow.appendChild(inputElement);
 
             // Second row: short description
             const shortDesc = document.createElement('span');
@@ -267,6 +288,8 @@ function createSettingsMenu(modalObj, settingsData, state) {
         modalObj.addContent(groupContainer);
     });
 }
+
+
 
 // Create the modal
 const settingsModal = createModal('settings-modal', mainContainer, 'Settings');
