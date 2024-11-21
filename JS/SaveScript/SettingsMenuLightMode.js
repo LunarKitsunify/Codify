@@ -40,7 +40,7 @@ const settingsData = [
 const mainContainer = document.createElement('div');
 mainContainer.style.width = '100%';
 mainContainer.style.height = '100%';
-mainContainer.style.backgroundColor = '#121212'; // Dark background
+mainContainer.style.backgroundColor = 'green';
 mainContainer.style.display = 'flex';
 mainContainer.style.flexDirection = 'column';
 mainContainer.style.boxSizing = 'border-box';
@@ -68,7 +68,7 @@ function createModal(id, parent, titleText) {
     overlay.style.left = '0';
     overlay.style.width = '100vw';
     overlay.style.height = '100vh';
-    overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.8)'; // Dark overlay
+    overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
     overlay.style.display = 'flex';
     overlay.style.justifyContent = 'center';
     overlay.style.alignItems = 'center';
@@ -79,10 +79,9 @@ function createModal(id, parent, titleText) {
     const modal = document.createElement('div');
     modal.style.width = '400px';
     modal.style.padding = '20px';
-    modal.style.backgroundColor = '#1e1e1e'; // Dark gray background for the modal
-    modal.style.color = '#ffffff'; // White text color
+    modal.style.backgroundColor = '#fff';
     modal.style.borderRadius = '8px';
-    modal.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.5)';
+    modal.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
     modal.style.display = 'flex';
     modal.style.flexDirection = 'column';
     modal.style.gap = '15px';
@@ -94,16 +93,15 @@ function createModal(id, parent, titleText) {
     header.style.justifyContent = 'space-between';
     header.style.marginBottom = '15px';
     header.style.padding = '10px'; // Padding inside the header
-    header.style.backgroundColor = '#252525'; // Darker background for the header
-    header.style.borderBottom = '1px solid #444'; // Line separating the header from the content
-    header.style.borderRadius = '8px 8px 0 0'; // Rounded top corners
+    header.style.backgroundColor = '#f1f1f1'; // Light background to highlight the header
+    header.style.borderBottom = '1px solid #ccc'; // Line separating the header from the content
+    header.style.borderRadius = '8px'; // Rounded top corners
 
     // Add the title to the header
     const title = document.createElement('h2');
     title.textContent = titleText;
     title.style.margin = '0';
     title.style.flexGrow = '1'; // The title takes up available space
-    title.style.color = '#ffffff'; // White text color
     header.appendChild(title);
 
     // Add a close button to the header
@@ -111,7 +109,7 @@ function createModal(id, parent, titleText) {
     closeButton.textContent = '×'; // Icon for the close button
     closeButton.style.fontSize = '30px'; // Larger font for better visibility
     closeButton.style.fontWeight = 'bold';
-    closeButton.style.color = '#ffffff'; // White color for the cross
+    closeButton.style.color = '#333';
     closeButton.style.border = 'none';
     closeButton.style.background = 'transparent';
     closeButton.style.cursor = 'pointer';
@@ -176,15 +174,15 @@ function createSettingsMenu(modalObj, settingsData, state) {
         const groupContainer = document.createElement('div');
         groupContainer.style.marginBottom = '20px';
         groupContainer.style.padding = '10px';
-        groupContainer.style.border = '1px solid #444'; // Darker border
+        groupContainer.style.border = '1px solid #ccc';
         groupContainer.style.borderRadius = '8px';
-        groupContainer.style.backgroundColor = '#2e2e2e'; // Dark gray background
+        groupContainer.style.backgroundColor = '#f9f9f9';
 
         // Add group title
         const groupTitle = document.createElement('h3');
         groupTitle.textContent = group.groupName;
         groupTitle.style.margin = '0 0 10px 0';
-        groupTitle.style.color = '#ffffff'; // White text color
+        groupTitle.style.color = '#333';
         groupContainer.appendChild(groupTitle);
 
         // Add each setting in the group
@@ -206,7 +204,6 @@ function createSettingsMenu(modalObj, settingsData, state) {
             settingName.style.marginRight = '10px';
             settingName.style.cursor = 'help';
             settingName.title = setting.fullDescription; // Tooltip for full description
-            settingName.style.color = '#ffffff'; // White text color
             topRow.appendChild(settingName);
 
             // Checkbox
@@ -232,7 +229,7 @@ function createSettingsMenu(modalObj, settingsData, state) {
             // Second row: short description
             const shortDesc = document.createElement('span');
             shortDesc.textContent = setting.shortDescription;
-            shortDesc.style.color = '#aaaaaa'; // Light gray for the short description
+            shortDesc.style.color = '#555';
             shortDesc.style.fontSize = '0.85em'; // Slightly smaller font size
             shortDesc.style.marginTop = '5px'; // Small top margin
             settingContainer.appendChild(topRow);
@@ -257,10 +254,9 @@ settingsButton.style.padding = '10px 20px';
 settingsButton.style.margin = '20px';
 settingsButton.style.border = 'none';
 settingsButton.style.borderRadius = '4px';
-settingsButton.style.backgroundColor = '#444'; // Dark button
-settingsButton.style.color = '#fff'; // White text color
+settingsButton.style.backgroundColor = '#007BFF';
+settingsButton.style.color = '#fff';
 settingsButton.style.cursor = 'pointer';
-
 settingsButton.addEventListener('click', () => {
     settingsModal.open(); // Open the modal
     createSettingsMenu(settingsModal, settingsData, settingsState); // Populate the modal with settings
