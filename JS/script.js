@@ -55,19 +55,18 @@ document.body.appendChild(mainContainer);
 
 /** 
  * Creates a modal window and returns an object to control it.
+ * The modal includes 4 equal containers for content organization.
  * @param {string} id - Unique identifier for the modal window.
  * @param {HTMLElement} parent - The parent element where the modal will be appended.
  * @param {string} titleText - The title text displayed in the modal header.
- * @returns {object} - Object with methods to open, close, and add content to the modal.
+ * @returns {object} - Object with methods to open, close, and add content to specific containers.
  */
 function createModal(id, parent, titleText) {
-    // Check if a modal with the given ID already exists
     if (document.getElementById(id)) {
         console.warn(`A modal with ID "${id}" already exists.`);
         return null;
     }
 
-    // Create the overlay (background) for the modal
     const overlay = document.createElement('div');
     overlay.id = id;
     overlay.style.position = 'fixed';
@@ -75,136 +74,148 @@ function createModal(id, parent, titleText) {
     overlay.style.left = '0';
     overlay.style.width = '100vw';
     overlay.style.height = '100vh';
-    overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.8)'; // Dark overlay
+    overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
     overlay.style.display = 'flex';
     overlay.style.justifyContent = 'center';
     overlay.style.alignItems = 'center';
     overlay.style.zIndex = '1000';
-    overlay.style.visibility = 'hidden'; // Initially hidden
+    overlay.style.visibility = 'hidden';
 
-    // Create the modal container
     const modal = document.createElement('div');
-    modal.style.width = '400px';
+    modal.style.width = '90%';
+    modal.style.height = '70%';
     modal.style.padding = '20px';
-    modal.style.backgroundColor = '#1e1e1e'; // Dark gray background for the modal
-    modal.style.color = '#ffffff'; // White text color
+    modal.style.backgroundColor = '#1e1e1e';
+    modal.style.color = '#ffffff';
     modal.style.borderRadius = '8px';
     modal.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.5)';
     modal.style.display = 'flex';
     modal.style.flexDirection = 'column';
-    modal.style.gap = '15px';
+    modal.style.gap = '1%';
+    modal.style.overflowY = 'hidden';
+    modal.style.overflowX = 'hidden';
 
-    // Create a header container for the title and close button
     const header = document.createElement('div');
     header.style.display = 'flex';
     header.style.alignItems = 'center';
     header.style.justifyContent = 'space-between';
     header.style.marginBottom = '15px';
-    header.style.padding = '10px'; // Padding inside the header
-    header.style.backgroundColor = '#2e2e2e'; // Darker background for the header
-    header.style.borderBottom = '1px solid white'; // Line separating the header from the content
-    header.style.borderRadius = '8px'; // Rounded top corners
+    header.style.padding = '10px';
+    header.style.backgroundColor = '#2e2e2e';
+    header.style.borderBottom = '1px solid white';
+    header.style.borderRadius = '8px';
 
-    // Add the title to the header
     const title = document.createElement('h2');
     title.textContent = titleText;
-    title.style.margin = '0';
-    title.style.margin = '0 auto'; // Center the title horizontally
+    title.style.margin = '0 auto';
     title.style.textAlign = 'center';
-    title.style.color = '#ffffff'; // White text color
+    title.style.color = '#ffffff';
     header.appendChild(title);
 
-    // Add a close button to the header
     const closeButton = document.createElement('button');
-    closeButton.textContent = '×'; // Icon for the close button
-    closeButton.style.fontSize = '30px'; // Larger font for better visibility
+    closeButton.textContent = '×';
+    closeButton.style.fontSize = '30px';
     closeButton.style.fontWeight = 'bold';
-    closeButton.style.color = '#ffffff'; // White color for the cross
+    closeButton.style.color = '#ffffff';
     closeButton.style.border = 'none';
     closeButton.style.background = 'transparent';
     closeButton.style.cursor = 'pointer';
-    closeButton.style.marginLeft = '10px';
-    closeButton.style.padding = '0';
-    closeButton.addEventListener('click', () => {
-        modalObj.clearContent(); // Clear dynamic content on close
-        modalObj.close();
-    });
+    closeButton.addEventListener('click', () => modalObj.close());
     closeButton.addEventListener('mouseenter', () => {
-        closeButton.style.color = '#ff4444'; // Change to red on hover
+        closeButton.style.color = '#ff4444';
+        closeButton.style.transform = 'scale(1.3)';
     });
     closeButton.addEventListener('mouseleave', () => {
-        closeButton.style.color = '#ffffff'; // Restore original color
+        closeButton.style.color = '#ffffff';
+        closeButton.style.transform = 'scale(1)';
     });
-
-    // Append the close button to the header
     header.appendChild(closeButton);
 
-    // Add the header to the modal
     modal.appendChild(header);
 
-    // Append the modal to the overlay and the overlay to the parent
+    // Create 4 equal containers inside the modal
+    const containers = [];
+    const containerWrapper = document.createElement('div');
+    containerWrapper.style.display = 'grid';
+    containerWrapper.style.gridTemplateColumns = 'repeat(4, 1fr)'; // 2 columns layout
+    containerWrapper.style.gridGap = '20px';
+    containerWrapper.style.width = '100%';
+    containerWrapper.style.height = '100%';
+    containerWrapper.style.padding = '0 1% 1% 0';
+
+    for (let i = 0; i < 4; i++) {
+        const container = document.createElement('div');
+        container.style.border = '1px solid #444';
+        container.style.borderRadius = '8px';
+        container.style.height = '100%'; // Placeholder height
+        container.style.overflowY = 'auto'; // Scrollable if content overflows
+        containers.push(container);
+        containerWrapper.appendChild(container);
+    }
+
+    modal.appendChild(containerWrapper);
     overlay.appendChild(modal);
     parent.appendChild(overlay);
 
-    // Object to control the modal window
     const modalObj = {
-        element: overlay, // Reference to the overlay
-        content: modal,   // Reference to the modal content
-        open: () => {     // Opens the modal
+        element: overlay,
+        content: modal,
+        containers: containers,
+        open: () => {
             overlay.style.visibility = 'visible';
         },
-        close: () => {    // Closes the modal
+        close: () => {
             overlay.style.visibility = 'hidden';
         },
-        addContent: (content) => { // Adds content to the modal
-            modal.appendChild(content);
-        },
-        clearContent: () => { // Removes all dynamically added content
-            Array.from(modal.children).forEach(child => {
-                if (child !== header) { // Only keep the header intact
-                    modal.removeChild(child);
-                }
-            });
+        addContent: (content, containerIndex) => {
+            if (containers[containerIndex]) {
+                containers[containerIndex].appendChild(content);
+            } else {
+                console.warn(`Container index ${containerIndex} does not exist.`);
+            }
         },
     };
 
-    return modalObj; // Return the control object
+    return modalObj;
 }
 
 /** 
- * Populates the modal with grouped settings and links them to an external state.
- * Adds different types of input elements based on the provided settings data.
- * Includes a subtle line between settings for better separation.
+ * Populates the specified container in the modal with grouped settings.
  * @param {object} modalObj - The modal object returned by createModal.
  * @param {Array} settingsData - Array of groups and their settings.
  * @param {object} state - External object to store the states of inputs.
+ * @param {number} containerIndex - Index of the container where settings will be added.
  */
-function createSettingsMenu(modalObj, settingsData, state) {
-    if (!modalObj || !modalObj.content) {
-        console.error('Invalid modal object provided.');
+function createSettingsMenu(modalObj, settingsData, state, containerIndex) {
+    if (!modalObj || !modalObj.containers[containerIndex]) {
+        console.error('Invalid modal object or container index provided.');
         return;
     }
 
+    const targetContainer = modalObj.containers[containerIndex];
     settingsData.forEach(group => {
-        // Create a group container
         const groupContainer = document.createElement('div');
-        groupContainer.style.marginBottom = '20px';
-        groupContainer.style.padding = '10px';
-        groupContainer.style.border = '1px solid #444'; // Darker border
+        groupContainer.style.border = '5px solid #808080';
         groupContainer.style.borderRadius = '8px';
-        groupContainer.style.backgroundColor = '#2e2e2e'; // Dark gray background
+        groupContainer.style.backgroundColor = '#2C2C2C';//'#2e2e2e';
+        groupContainer.style.width = '100%';
+        groupContainer.style.height = '100%';
+        groupContainer.style.boxSizing = 'border-box';
+        groupContainer.style.overflowY = 'hidden';
+        groupContainer.style.overflowX = 'hidden';
+        groupContainer.style.padding = '1%';
 
-        // Add group title
         const groupTitle = document.createElement('h3');
         groupTitle.textContent = group.groupName;
-        groupTitle.style.margin = '0 0 15px 0'; // Increased margin below the group title
-        groupTitle.style.padding = '10px'; // Added padding for the title area
-        groupTitle.style.backgroundColor = '#1e1e1e'; // Background to separate group visually
-        groupTitle.style.color = '#ffffff'; // White text color
-        groupTitle.style.borderRadius = '8px'; // Rounded edges for the title box
-        groupTitle.style.border = '1px solid #444'; // Border for the title box
-        groupTitle.style.textAlign = 'center'; // Center-align the group title
+        groupTitle.style.margin = '0 0 15px 0';
+        groupTitle.style.padding = '10px';
+        groupTitle.style.backgroundColor = '#1e1e1e';
+        groupTitle.style.color = '#ffffff';
+        groupTitle.style.borderRadius = '8px';
+        groupTitle.style.textAlign = 'center';
+        groupTitle.style.border = '1px solid white';
         groupContainer.appendChild(groupTitle);
+
 
         // Add each setting in the group
         group.settings.forEach((setting, index) => {
@@ -284,11 +295,9 @@ function createSettingsMenu(modalObj, settingsData, state) {
             groupContainer.appendChild(settingContainer);
         });
 
-        // Append group container to the modal content
-        modalObj.addContent(groupContainer);
+        targetContainer.appendChild(groupContainer);
     });
 }
-
 
 
 // Create the modal
@@ -307,7 +316,10 @@ settingsButton.style.cursor = 'pointer';
 
 settingsButton.addEventListener('click', () => {
     settingsModal.open(); // Open the modal
-    createSettingsMenu(settingsModal, settingsData, settingsState); // Populate the modal with settings
+    createSettingsMenu(settingsModal, settingsData, settingsState, 0); 
+    // createSettingsMenu(settingsModal, null, settingsState, 1); 
+    // createSettingsMenu(settingsModal, null, settingsState, 2); 
+    // createSettingsMenu(settingsModal, null, settingsState, 3); 
     console.log('Settings state:', settingsState);
 });
 
