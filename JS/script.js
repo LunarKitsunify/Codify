@@ -285,8 +285,9 @@ function createSettingsMenu(modalObj, settingsData, state, containerIndex) {
             // Second row: short description
             const shortDesc = document.createElement('span');
             shortDesc.textContent = setting.shortDescription;
+            shortDesc.style.scale = '0.1';
             shortDesc.style.color = '#aaaaaa'; // Light gray for the short description
-            shortDesc.style.fontSize = '0.85em'; // Slightly smaller font size
+            //shortDesc.style.fontSize = '0.85em'; // Slightly smaller font size
             shortDesc.style.marginTop = '5px'; // Small top margin
             settingContainer.appendChild(topRow);
             settingContainer.appendChild(shortDesc);
