@@ -1,35 +1,4 @@
-//#region Main Div
-const mainContainer = document.createElement('div');
-mainContainer.style.width = '100%';
-mainContainer.style.height = '100%';
-mainContainer.style.backgroundColor = 'green';
-mainContainer.style.display = 'flex';
-mainContainer.style.flexDirection = 'column';
-mainContainer.style.boxSizing = 'border-box';
-document.body.appendChild(mainContainer);
-
-const topContainer = document.createElement('div');
-topContainer.style.width = '75%';
-topContainer.style.height = '85%';
-topContainer.style.backgroundColor = '#fcba03';
-topContainer.style.display = 'flex';
-topContainer.style.flexDirection = 'column';
-topContainer.style.justifyContent = 'center';
-mainContainer.appendChild(topContainer);
-
-const bottomContainer = document.createElement('div');
-bottomContainer.style.width = '75%';
-bottomContainer.style.height = '15%';
-bottomContainer.style.backgroundColor = 'lightgreen';
-bottomContainer.style.display = 'flex';
-bottomContainer.style.justifyContent = 'center';
-mainContainer.appendChild(bottomContainer);
-
-
-//#endregion
-
-//#region Card Viewer Rows
-const createCardRows = (cardsArray, parent) => {
+export function createCardRows(cardsArray, parent){
     const cardsPerRow = 10;
     const numberOfRows = Math.ceil(cardsArray.length / cardsPerRow);
   
@@ -66,9 +35,9 @@ const createCardRows = (cardsArray, parent) => {
       parent.appendChild(row);
     }
   };
-//#endregion
+
   
-// Использование
-const cards = Array.from({ length: 30 }, (_, i) => i + 1);
-createCardRows(cards, topContainer);
+// // Использование
+// const cards = Array.from({ length: 30 }, (_, i) => i + 1);
+// createCardRows(cards, topContainer);
   

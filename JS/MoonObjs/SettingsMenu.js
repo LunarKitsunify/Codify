@@ -1,58 +1,3 @@
-// External object to store the states of all settings checkboxes
-// This object will dynamically update as checkboxes are interacted with
-const settingsState = {};
-
-// Example settings data, structured in groups with individual settings
-const settingsData = [
-    {
-        groupName: 'General Settings',
-        settings: [
-            { 
-                name: 'Enable Notifications', 
-                shortDescription: 'Receive alerts', 
-                fullDescription: 'Enables notifications for all important updates.', 
-                type: 'checkbox' 
-            },
-            { 
-                name: 'Username', 
-                shortDescription: 'Enter your username', 
-                fullDescription: 'Your unique username for the system.', 
-                type: 'text' 
-            },
-            { 
-                name: 'Theme', 
-                shortDescription: 'Select a theme', 
-                fullDescription: 'Choose between Light and Dark themes.', 
-                type: 'dropdown', 
-                options: ['Light', 'Dark'] 
-            }
-        ]
-    }
-];
-
-
-document.documentElement.style.margin = '0';
-document.documentElement.style.padding = '0';
-document.documentElement.style.width = '100%';
-document.documentElement.style.height = '100%';
-document.documentElement.style.overflow = 'hidden';
-
-document.body.style.margin = '0';
-document.body.style.padding = '0';
-document.body.style.width = '100%';
-document.body.style.height = '100%';
-document.body.style.overflow = 'hidden';
-
-// Create the main container for the application and append it to the document body
-const mainContainer = document.createElement('div');
-mainContainer.style.width = '100%';
-mainContainer.style.height = '100%';
-mainContainer.style.backgroundColor = '#121212'; // Dark background
-mainContainer.style.display = 'flex';
-mainContainer.style.flexDirection = 'column';
-mainContainer.style.boxSizing = 'border-box';
-document.body.appendChild(mainContainer);
-
 /** 
  * Creates a modal window and returns an object to control it.
  * @param {string} id - Unique identifier for the modal window.
@@ -60,7 +5,7 @@ document.body.appendChild(mainContainer);
  * @param {string} titleText - The title text displayed in the modal header.
  * @returns {object} - Object with methods to open, close, and add content to the modal.
  */
-function createModal(id, parent, titleText) {
+export function createModal(id, parent, titleText) {
     // Check if a modal with the given ID already exists
     if (document.getElementById(id)) {
         console.warn(`A modal with ID "${id}" already exists.`);
@@ -79,20 +24,23 @@ function createModal(id, parent, titleText) {
     overlay.style.display = 'flex';
     overlay.style.justifyContent = 'center';
     overlay.style.alignItems = 'center';
-    overlay.style.zIndex = '1000';
     overlay.style.visibility = 'hidden'; // Initially hidden
-
+    parent.appendChild(overlay);
+    
     // Create the modal container
     const modal = document.createElement('div');
-    modal.style.width = '400px';
+    modal.style.width = 'auto';
+    modal.style.minWidth = '600px';
     modal.style.padding = '20px';
     modal.style.backgroundColor = '#1e1e1e'; // Dark gray background for the modal
     modal.style.color = '#ffffff'; // White text color
     modal.style.borderRadius = '8px';
     modal.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.5)';
-    modal.style.display = 'flex';
-    modal.style.flexDirection = 'column';
     modal.style.gap = '15px';
+    overlay.appendChild(modal);
+
+
+    //#region Header
 
     // Create a header container for the title and close button
     const header = document.createElement('div');
@@ -131,20 +79,36 @@ function createModal(id, parent, titleText) {
     });
     closeButton.addEventListener('mouseenter', () => {
         closeButton.style.color = '#ff4444'; // Change to red on hover
+        closeButton.style.transform = 'scale(1.2)'; // Slightly enlarge the button
+        closeButton.style.transition = 'transform 0.2s ease, color 0.2s ease'; // Smooth transition
     });
+    
     closeButton.addEventListener('mouseleave', () => {
         closeButton.style.color = '#ffffff'; // Restore original color
+        closeButton.style.transform = 'scale(1)'; // Restore original size
     });
-
     // Append the close button to the header
     header.appendChild(closeButton);
 
     // Add the header to the modal
     modal.appendChild(header);
 
-    // Append the modal to the overlay and the overlay to the parent
-    overlay.appendChild(modal);
-    parent.appendChild(overlay);
+    //#endregion
+
+
+    //#region Content
+
+    // Create the content container
+    const content = document.createElement('div');
+    content.style.flex = '1'; // Fill available space
+    content.style.display = 'flex';
+    content.style.flexDirection = 'column'; // Default to vertical layout
+    content.style.overflow = 'hidden'; // Prevent overflow
+    content.style.backgroundColor = '#1e1e1e';
+    modal.appendChild(content);
+
+    //#endregion
+
 
     // Object to control the modal window
     const modalObj = {
@@ -156,9 +120,6 @@ function createModal(id, parent, titleText) {
         close: () => {    // Closes the modal
             overlay.style.visibility = 'hidden';
         },
-        addContent: (content) => { // Adds content to the modal
-            modal.appendChild(content);
-        },
         clearContent: () => { // Removes all dynamically added content
             Array.from(modal.children).forEach(child => {
                 if (child !== header) { // Only keep the header intact
@@ -166,6 +127,20 @@ function createModal(id, parent, titleText) {
                 }
             });
         },
+        addMenuContainer: ( direction = 'row') => {
+            const menuContainer = document.createElement('div');
+            menuContainer.style.flex = '1';
+            menuContainer.style.display = 'flex';
+            menuContainer.style.flexDirection = direction;
+            menuContainer.style.gap = '10px';
+            menuContainer.style.padding = '10px';
+            menuContainer.style.overflowY = direction === 'column' ? 'auto' : 'hidden'; // Вертикальная прокрутка для столбцов
+            menuContainer.style.overflowX = direction === 'row' ? 'auto' : 'hidden'; // Горизонтальная прокрутка для строк
+            menuContainer.style.backgroundColor = '#1e1e1e';
+            content.style.flexDirection = direction;
+            content.appendChild(menuContainer);
+            return menuContainer;
+        }
     };
 
     return modalObj; // Return the control object
@@ -175,81 +150,69 @@ function createModal(id, parent, titleText) {
  * Populates the modal with grouped settings and links them to an external state.
  * Adds different types of input elements based on the provided settings data.
  * Includes a subtle line between settings for better separation.
- * @param {object} modalObj - The modal object returned by createModal.
+ * @param {object} parent - The modal object returned by createModal.
  * @param {Array} settingsData - Array of groups and their settings.
- * @param {object} state - External object to store the states of inputs.
  */
-function createSettingsMenu(modalObj, settingsData, state) {
-    if (!modalObj || !modalObj.content) {
+export function createSettingsMenu(parent, settingsData) {
+    if (!parent) {
         console.error('Invalid modal object provided.');
         return;
     }
 
     settingsData.forEach(group => {
-        // Create a group container
         const groupContainer = document.createElement('div');
         groupContainer.style.marginBottom = '20px';
         groupContainer.style.padding = '10px';
-        groupContainer.style.border = '1px solid #444'; // Darker border
+        groupContainer.style.border = '1px solid #444';
         groupContainer.style.borderRadius = '8px';
-        groupContainer.style.backgroundColor = '#2e2e2e'; // Dark gray background
+        groupContainer.style.backgroundColor = '#2e2e2e';
 
-        // Add group title
         const groupTitle = document.createElement('h3');
         groupTitle.textContent = group.groupName;
-        groupTitle.style.margin = '0 0 15px 0'; // Increased margin below the group title
-        groupTitle.style.padding = '10px'; // Added padding for the title area
-        groupTitle.style.backgroundColor = '#1e1e1e'; // Background to separate group visually
-        groupTitle.style.color = '#ffffff'; // White text color
-        groupTitle.style.borderRadius = '8px'; // Rounded edges for the title box
-        groupTitle.style.border = '1px solid #444'; // Border for the title box
-        groupTitle.style.textAlign = 'center'; // Center-align the group title
+        groupTitle.style.margin = '0 0 15px 0';
+        groupTitle.style.padding = '10px';
+        groupTitle.style.backgroundColor = '#1e1e1e';
+        groupTitle.style.color = '#ffffff';
+        groupTitle.style.borderRadius = '8px';
+        groupTitle.style.border = '1px solid #444';
+        groupTitle.style.textAlign = 'center';
         groupContainer.appendChild(groupTitle);
 
-        // Add each setting in the group
-        group.settings.forEach((setting, index) => {
+        group.settings.forEach(setting => {
             const settingContainer = document.createElement('div');
             settingContainer.style.display = 'flex';
-            settingContainer.style.flexDirection = 'column'; // Vertical stacking of rows
-            settingContainer.style.marginBottom = '15px'; // Space between settings
-            settingContainer.style.paddingBottom = '10px'; // Space above the line
+            settingContainer.style.flexDirection = 'column';
+            settingContainer.style.marginBottom = '15px';
+            settingContainer.style.paddingBottom = '10px';
+            settingContainer.style.borderBottom = '1px solid #444';
 
-            // Add a subtle border for separation (except the last setting)
-            if (index < group.settings.length - 1) {
-                settingContainer.style.borderBottom = '1px solid #444'; // Thin line
-            }
-
-            // First row: setting name and input element
             const topRow = document.createElement('div');
             topRow.style.display = 'flex';
             topRow.style.alignItems = 'center';
             topRow.style.width = '100%';
 
-            // Setting name
             const settingName = document.createElement('label');
             settingName.textContent = setting.name;
+            settingName.title = setting.fullDescription;
             settingName.style.marginRight = '10px';
             settingName.style.cursor = 'help';
-            settingName.title = setting.fullDescription; // Tooltip for full description
-            settingName.style.color = '#ffffff'; // White text color
+            settingName.style.color = '#ffffff';
             topRow.appendChild(settingName);
 
-            // Input element based on type
             let inputElement;
             if (setting.type === 'checkbox') {
                 inputElement = document.createElement('input');
                 inputElement.type = 'checkbox';
                 inputElement.style.marginLeft = 'auto';
-                inputElement.style.transform = 'scale(1.5)'; // Enlarged checkbox
-                inputElement.style.marginRight = '10px'; // Add spacing
-                inputElement.checked = state[setting.name] || false;
+                inputElement.style.transform = 'scale(1.5)';
+                inputElement.checked = setting.defaultValue || false; // Default value if provided
             } else if (setting.type === 'text') {
                 inputElement = document.createElement('input');
                 inputElement.type = 'text';
                 inputElement.style.marginLeft = 'auto';
                 inputElement.style.padding = '5px';
-                inputElement.style.width = '200px'; // Fixed width for text input
-                inputElement.value = state[setting.name] || ''; // Use existing value or default
+                inputElement.style.width = '200px';
+                inputElement.value = setting.defaultValue || ''; // Default value if provided
             } else if (setting.type === 'dropdown') {
                 inputElement = document.createElement('select');
                 inputElement.style.marginLeft = 'auto';
@@ -261,55 +224,50 @@ function createSettingsMenu(modalObj, settingsData, state) {
                     optionElement.textContent = option;
                     inputElement.appendChild(optionElement);
                 });
-                inputElement.value = state[setting.name] || (setting.options ? setting.options[0] : '');
+                inputElement.value = setting.defaultValue || (setting.options ? setting.options[0] : '');
+            } else if (setting.type === 'button') {
+                inputElement = document.createElement('button');
+                inputElement.textContent = setting.name;
+                inputElement.style.marginLeft = 'auto';
+                inputElement.style.padding = '5px 10px';
+                inputElement.style.backgroundColor = '#444';
+                inputElement.style.color = '#fff';
+                inputElement.style.border = 'none';
+                inputElement.style.borderRadius = '4px';
+                inputElement.style.cursor = 'pointer';
+            
+                // Логика при нажатии кнопки
+                inputElement.addEventListener('click', () => {
+                    if (typeof setting.onClick === 'function') {
+                        setting.onClick();
+                    }
+                });
             }
 
-            // Bind input element to external state
+            // Add change listener
             inputElement.addEventListener('change', () => {
-                state[setting.name] = inputElement.type === 'checkbox' ? inputElement.checked : inputElement.value;
-                console.log(`Setting "${setting.name}" updated: ${state[setting.name]}`);
+                const newValue = inputElement.type === 'checkbox' ? inputElement.checked : inputElement.value;
+
+                // Trigger the onChange callback if provided
+                if (typeof setting.onChange === 'function') {
+                    setting.onChange(newValue);
+                }
             });
+
             topRow.appendChild(inputElement);
 
-            // Second row: short description
             const shortDesc = document.createElement('span');
             shortDesc.textContent = setting.shortDescription;
-            shortDesc.style.color = '#aaaaaa'; // Light gray for the short description
-            shortDesc.style.fontSize = '0.85em'; // Slightly smaller font size
-            shortDesc.style.marginTop = '5px'; // Small top margin
+            shortDesc.style.color = '#aaaaaa';
+            shortDesc.style.fontSize = '0.85em';
+            shortDesc.style.marginTop = '5px';
             settingContainer.appendChild(topRow);
             settingContainer.appendChild(shortDesc);
 
-            // Append setting to the group container
             groupContainer.appendChild(settingContainer);
         });
 
-        // Append group container to the modal content
-        modalObj.addContent(groupContainer);
+        parent.appendChild(groupContainer);
     });
 }
 
-
-
-// Create the modal
-const settingsModal = createModal('settings-modal', mainContainer, 'Settings');
-
-// Button to open the modal
-const settingsButton = document.createElement('button');
-settingsButton.textContent = 'Open Settings';
-settingsButton.style.padding = '10px 20px';
-settingsButton.style.margin = '20px';
-settingsButton.style.border = 'none';
-settingsButton.style.borderRadius = '4px';
-settingsButton.style.backgroundColor = '#444'; // Dark button
-settingsButton.style.color = '#fff'; // White text color
-settingsButton.style.cursor = 'pointer';
-
-settingsButton.addEventListener('click', () => {
-    settingsModal.open(); // Open the modal
-    createSettingsMenu(settingsModal, settingsData, settingsState); // Populate the modal with settings
-    console.log('Settings state:', settingsState);
-});
-
-// Append the settings button to the main container
-mainContainer.appendChild(settingsButton);
