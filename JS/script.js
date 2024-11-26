@@ -30,10 +30,6 @@ document.body.appendChild(mainContainer);
 
 //#region Property and const
 
-// External object to store the states of all settings checkboxes
-// This object will dynamically update as checkboxes are interacted with
-const settingsState = {};
-
 // Example settings data, structured in groups with individual settings
 const settingsData = [
     {
@@ -107,9 +103,6 @@ settingsButton.style.cursor = 'pointer';
 
 settingsButton.addEventListener('click', () => {
     settingsModal.open(); // Open the modal
-    //createSettingsMenu(settingsModal, settingsData, settingsState); // Populate the modal with settings
-    //console.log('Settings state:', settingsState);
-
     createSettingsMenu(menuContainer1, settingsData);
     createSettingsMenu(menuContainer2, settingsData);
     createSettingsMenu(menuContainer3, settingsData);

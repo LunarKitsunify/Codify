@@ -162,7 +162,7 @@ export function createSettingsMenu(parent, settingsData) {
     settingsData.forEach(group => {
         const groupContainer = document.createElement('div');
         groupContainer.style.marginBottom = '20px';
-        groupContainer.style.padding = '10px';
+        groupContainer.style.padding = '25px';
         groupContainer.style.border = '1px solid #444';
         groupContainer.style.borderRadius = '8px';
         groupContainer.style.backgroundColor = '#2e2e2e';
